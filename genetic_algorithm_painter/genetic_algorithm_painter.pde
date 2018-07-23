@@ -165,7 +165,7 @@ float karvo(IntList l) {
 
 float mediaani(IntList l) {
   l.sort();
-  if (l.size() % 2 == 0 && l.size() > 0) {
+  if (l.size() % 2 == 0 && l.size() > 3) {
     int ind = l.size()/2;
     int ind1 = ind-1;
     int ind2 = ind+1;
@@ -249,10 +249,16 @@ void draw() {
       float x3 = (width-(256+256+2))*gene.get(4)+256+256+2;
       float y3 = (256)*gene.get(5);
     
-      float r = 255*gene.get(0);
-      float g = 255*gene.get(1);
-      float b = 255*gene.get(2);
-      float alpha = 255*gene.get(3);
+      // bug fixed 23.7.2018
+      //float r = 255*gene.get(0);
+      //float g = 255*gene.get(1);
+      //float b = 255*gene.get(2);
+      //float alpha = 255*gene.get(3);
+      float r = 255*gene.get(6);
+      float g = 255*gene.get(7);
+      float b = 255*gene.get(8);
+      float alpha = 255*gene.get(9);
+      
       fill(r,g,b,alpha);
       
       triangle(x1,y1,x2,y2,x3,y3);
@@ -274,11 +280,17 @@ void draw() {
     float y2 = (height-256)+gene.get(3)*256;
     float x3 = (width-(256+256+2))*gene.get(4)+256+256+2;
     float y3 = (height-256)+gene.get(5)*256;
-  
-    float r = 255*gene.get(0);
-    float g = 255*gene.get(1);
-    float b = 255*gene.get(2);
-    float alpha = 255*gene.get(3);
+    
+    //bug fix 23.7.2018
+    //float r = 255*gene.get(0);
+    //float g = 255*gene.get(1);
+    //float b = 255*gene.get(2);
+    //float alpha = 255*gene.get(3);
+    float r = 255*gene.get(6);
+    float g = 255*gene.get(7);
+    float b = 255*gene.get(8);
+    float alpha = 255*gene.get(9);
+    
     fill(r,g,b,alpha);
     
     triangle(x1,y1,x2,y2,x3,y3);
