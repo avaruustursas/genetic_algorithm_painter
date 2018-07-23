@@ -1,5 +1,15 @@
 // Processing 3.3.7.
 // 23.07.2018
+// TODO: DNA io with text or JSON files etc.
+// TODO: Include recombinations of previous population to the new one
+// TODO: Save images from the best (and their possible parents)
+// TODO: Generate family tree from these images
+// TODO: Separate window for the output
+// TODO: Use python + numpy for this
+// TODO: Polygons instead of just triangles
+// TODO: Other image size than 256x256
+// TODO: Test if two genomes which have been without contact for generations can produce viable/fit offspring. What is the threshold for this
+//
 // GitHub repo creation and refactoring and translation to English
 // 19.07.2018 avaruustursas
 // 21.7.2018
@@ -155,7 +165,7 @@ float karvo(IntList l) {
 
 float mediaani(IntList l) {
   l.sort();
-  if (l.size() % 2 == 0) {
+  if (l.size() % 2 == 0 && l.size() > 0) {
     int ind = l.size()/2;
     int ind1 = ind-1;
     int ind2 = ind+1;
@@ -167,16 +177,48 @@ float mediaani(IntList l) {
   }
 }
 
+// 23.7.2018
+void save_genome_to_disc_JSON(FloatList[] genome,float value,int generation, String filename) {
+  JSONObject genome_json = new JSONObject();
+  JSONArray genome_array = new JSONArray();
+  JSONObject metadata = new JSONObject();
+  metadata.setString("filename",filename);
+  metadata.setFloat("fitness_value",value);
+  metadata.setInt("generation",generation);
+  genome_json.setJSONObject("metadata",metadata);
+  for (FloatList g : genome) {
+    JSONObject gene = new JSONObject();
+    // last four values are for color and the pairs before that are (x,y) points of the triangle (TODO: polygon)
+    // let's take the colour out of the gene
+    int color_start_index = g.size()-4;
+    gene.setFloat("r",g.remove(color_start_index));
+    gene.setFloat("g",g.remove(color_start_index));
+    gene.setFloat("b",g.remove(color_start_index));
+    gene.setFloat("a",g.remove(color_start_index));
+    // now the remaining values are the points
+    int i = 1;
+    for (float f : g) {
+      gene.setFloat("x"+i,f);
+      i++;
+    }
+  genome_array.append(gene);  
+  }
+  genome_json.setJSONArray("genome",genome_array);
+  // for now use default time stamped file name and sketch data dir as location // 23.7.2018 
+  saveJSONObject(genome_json,"data/genome_"+year()+"-"+month()+"-"+day()+"T"+hour()+":"+minute()+":"+second()+"."+millis()+".json");
+}
+
 PImage img;
 FloatList[] genome;
 int generation = 0;
 int generation_of_the_fittest = 0;
+String input_file_name = "testikuva.png";
 
 void setup() {
   size(800,600);
   background(0);
   // load input image (256x256 pixels)
-  img = loadImage("testikuva.png");
+  img = loadImage(input_file_name);
   //img = loadImage("lena.png");
   genome = create_genome(NGENES);
   print("setup ready\n");
@@ -246,5 +288,15 @@ void draw() {
   genome = copy_genome(fittest_one);
   print("Ongoing generation: "+generation+", generation of the fittest ("+generation_of_the_fittest+")\n");
   print("Average amount of steps to generate better fit "+karvo(steps_to_new_one)+" (median "+mediaani(steps_to_new_one)+") generations\n");
-  generation++;
+  generation++;  
+}
+
+// check if ESC is pressed and if so save the current fittest genome and exit
+void keyPressed() {
+  if (key == ESC) {
+    print("Saving the current fittest genome with value "+fittest_value+"\n");
+    save_genome_to_disc_JSON(fittest_one,fittest_value,generation_of_the_fittest,input_file_name);
+    print("Exiting\n");
+    exit();
+  }
 }
